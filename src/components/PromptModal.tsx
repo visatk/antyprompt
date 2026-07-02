@@ -30,7 +30,7 @@ export default function PromptModal({ prompt, category, onClose, onCopy }: Promp
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-overlay"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md modal-overlay"
       onClick={onClose}
     >
       <div
@@ -40,9 +40,10 @@ export default function PromptModal({ prompt, category, onClose, onCopy }: Promp
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-lg glass hover:bg-bg-glass-hover transition-colors cursor-pointer z-10"
+          className="absolute top-4 right-4 p-2 rounded-lg glass hover:bg-bg-glass-hover transition-colors cursor-pointer z-10 focus-visible:ring-2 focus-visible:ring-accent-purple"
+          aria-label="Close modal"
         >
-          <X className="w-5 h-5 text-text-secondary" />
+          <X className="w-5 h-5 text-text-secondary hover:text-text-primary transition-colors" />
         </button>
 
         <div className="p-8">
@@ -80,19 +81,20 @@ export default function PromptModal({ prompt, category, onClose, onCopy }: Promp
             <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">
               Prompt Template
             </h3>
-            <div className="relative">
+            <div className="relative group">
               <button
                 onClick={handleCopyTemplate}
-                className="absolute top-3 right-3 p-2 rounded-lg glass hover:bg-bg-glass-hover transition-colors cursor-pointer"
+                className="absolute top-3 right-3 p-2 rounded-lg glass hover:bg-bg-glass-hover transition-all duration-200 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-purple"
                 title="Copy template"
+                aria-label="Copy prompt template text"
               >
                 {copied ? (
                   <Check className="w-4 h-4 text-accent-green copy-success" />
                 ) : (
-                  <Copy className="w-4 h-4 text-text-secondary" />
+                  <Copy className="w-4 h-4 text-text-secondary hover:text-text-primary transition-colors" />
                 )}
               </button>
-              <pre className="bg-black/40 rounded-xl p-6 font-mono text-sm text-text-primary whitespace-pre-wrap leading-relaxed overflow-x-auto border border-border-subtle">
+              <pre className="bg-black/40 rounded-xl p-6 font-mono text-sm text-text-primary whitespace-pre-wrap leading-relaxed overflow-x-auto border border-border-subtle hover:border-border-glow transition-colors">
                 {prompt.promptTemplate}
               </pre>
             </div>

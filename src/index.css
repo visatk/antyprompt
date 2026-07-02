@@ -208,6 +208,30 @@ body {
   animation: card-enter 0.5s ease-out both;
 }
 
+.card-animate:hover {
+  transform: translateY(-4px);
+}
+
+/* ======== FOCUS STYLES ======== */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-accent-purple);
+}
+
+/* ======== CUSTOM DROPDOWN ======== */
+.dropdown-glass {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%238b8ba3' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.dropdown-glass option {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
 /* ======== PULSE DOT ======== */
 @keyframes pulse-dot {
   0%, 100% { transform: scale(1); opacity: 1; }

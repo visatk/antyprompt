@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Category, CategoryId } from '../types';
 
 interface CategoryGridProps {
@@ -7,7 +8,7 @@ interface CategoryGridProps {
   promptCounts: Record<CategoryId, number>;
 }
 
-export default function CategoryGrid({ categories, selectedCategory, onSelectCategory, promptCounts }: CategoryGridProps) {
+const CategoryGrid = memo(function CategoryGrid({ categories, selectedCategory, onSelectCategory, promptCounts }: CategoryGridProps) {
   const totalCount = Object.values(promptCounts).reduce((sum, c) => sum + c, 0);
 
   return (
@@ -24,7 +25,7 @@ export default function CategoryGrid({ categories, selectedCategory, onSelectCat
             onClick={() => onSelectCategory('all')}
             className={`glass gradient-border glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
               selectedCategory === 'all'
-                ? 'ring-2 ring-accent-purple bg-bg-card-hover'
+                ? 'ring-2 ring-accent-purple ring-offset-2 ring-offset-[#06060a] bg-bg-card-hover'
                 : ''
             }`}
           >
@@ -42,7 +43,7 @@ export default function CategoryGrid({ categories, selectedCategory, onSelectCat
               onClick={() => onSelectCategory(cat.id)}
               className={`glass gradient-border glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
                 selectedCategory === cat.id
-                  ? 'ring-2 ring-accent-purple bg-bg-card-hover'
+                  ? 'ring-2 ring-accent-purple ring-offset-2 ring-offset-[#06060a] bg-bg-card-hover'
                   : ''
               }`}
             >
@@ -57,4 +58,6 @@ export default function CategoryGrid({ categories, selectedCategory, onSelectCat
       </div>
     </section>
   );
-}
+});
+
+export default CategoryGrid;

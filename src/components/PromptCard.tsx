@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Eye, Copy, Crown } from 'lucide-react';
 import type { Prompt, Category } from '../types';
 
@@ -9,10 +10,10 @@ interface PromptCardProps {
   index: number;
 }
 
-export default function PromptCard({ prompt, category, onSelect, onCopy, index }: PromptCardProps) {
+const PromptCard = memo(function PromptCard({ prompt, category, onSelect, onCopy, index }: PromptCardProps) {
   return (
     <div
-      className="glass gradient-border rounded-2xl p-5 flex flex-col gap-3 card-animate transition-all duration-300 hover:bg-bg-card-hover"
+      className="glass gradient-border rounded-2xl p-5 flex flex-col gap-3 card-animate transition-all duration-300 hover:bg-bg-card-hover group"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       {/* Top row: category + difficulty + pro */}
@@ -35,7 +36,7 @@ export default function PromptCard({ prompt, category, onSelect, onCopy, index }
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-semibold text-text-primary leading-snug">
+      <h3 className="text-lg font-semibold text-text-primary leading-snug group-hover:text-accent-purple-light transition-colors">
         {prompt.title}
       </h3>
 
@@ -60,19 +61,23 @@ export default function PromptCard({ prompt, category, onSelect, onCopy, index }
       <div className="flex items-center gap-2 pt-2 border-t border-border-subtle">
         <button
           onClick={() => onSelect(prompt)}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-accent-purple to-accent-cyan text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
+          aria-label={`View details for ${prompt.title}`}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-accent-purple to-accent-cyan text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-purple"
         >
           <Eye className="w-4 h-4" />
           View Prompt
         </button>
         <button
           onClick={() => onCopy(prompt.promptTemplate)}
-          className="p-2.5 rounded-lg glass hover:bg-bg-glass-hover transition-colors cursor-pointer"
+          className="p-2.5 rounded-lg glass hover:bg-bg-glass-hover transition-all duration-200 hover:scale-110 cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-purple"
           title="Copy prompt template"
+          aria-label="Copy prompt template"
         >
-          <Copy className="w-4 h-4 text-text-secondary" />
+          <Copy className="w-4 h-4 text-text-secondary hover:text-text-primary transition-colors" />
         </button>
       </div>
     </div>
   );
-}
+});
+
+export default PromptCard;

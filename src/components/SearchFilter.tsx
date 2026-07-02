@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { FilterState, Difficulty } from '../types';
 
 interface SearchFilterProps {
@@ -20,12 +21,12 @@ const difficultyColors: Record<string, string> = {
   advanced: 'bg-accent-red/20 text-accent-red',
 };
 
-export default function SearchFilter({ filters, onFilterChange, resultCount }: SearchFilterProps) {
+const SearchFilter = memo(function SearchFilter({ filters, onFilterChange, resultCount }: SearchFilterProps) {
   return (
     <div className="glass rounded-xl p-3">
       <div className="flex flex-wrap items-center gap-3">
         {/* Difficulty pills */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {difficulties.map((d) => {
             const isActive = filters.difficulty === d.value;
             return (
@@ -48,7 +49,7 @@ export default function SearchFilter({ filters, onFilterChange, resultCount }: S
         <select
           value={filters.sort}
           onChange={(e) => onFilterChange({ ...filters, sort: e.target.value as FilterState['sort'] })}
-          className="ml-auto px-3 py-1.5 rounded-lg glass text-sm text-text-secondary bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-accent-purple/30 cursor-pointer appearance-none"
+          className="ml-auto px-4 py-1.5 rounded-lg glass text-sm text-text-secondary bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-accent-purple/30 cursor-pointer appearance-none dropdown-glass hover:bg-bg-glass-hover transition-colors"
         >
           <option value="newest">Newest</option>
           <option value="az">A → Z</option>
@@ -62,4 +63,6 @@ export default function SearchFilter({ filters, onFilterChange, resultCount }: S
       </div>
     </div>
   );
-}
+});
+
+export default SearchFilter;

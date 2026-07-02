@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search, Zap, FolderOpen, Gift } from 'lucide-react';
+import { useDebounce } from '../hooks/useDebounce';
 
 interface HeroProps {
   totalPrompts: number;
@@ -10,6 +11,20 @@ interface HeroProps {
 
 export default function Hero({ totalPrompts, totalCategories, searchValue, onSearchChange }: HeroProps) {
   const searchRef = useRef<HTMLInputElement>(null);
+  
+  // Local state for immediate typing feedback
+  const [localSearch, setLocalSearch] = useState(searchValue);
+  const debouncedSearch = useDebounce(localSearch, 300);
+
+  // Sync debounced value up to parent
+  useEffect(() => {
+    onSearchChange(debouncedSearch);
+  }, [debouncedSearch, onSearchChange]);
+
+  // Sync external changes down to local state (e.g. clear filters)
+  useEffect(() => {
+    setLocalSearch(searchValue);
+  }, [searchValue]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -81,13 +96,15 @@ export default function Hero({ totalPrompts, totalCategories, searchValue, onSea
 
         {/* Search */}
         <div className="max-w-2xl mx-auto relative">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted pointer-events-none" />
           <input
+            id="prompt-search"
             ref={searchRef}
             type="text"
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
             placeholder="Search prompts by title, tag, or keyword..."
+            aria-label="Search prompts"
             className="w-full pl-14 pr-6 py-4 rounded-2xl glass text-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-purple/50 transition-all"
           />
           <p className="mt-3 text-xs text-text-muted">
