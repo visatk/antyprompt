@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-shop",
+	"name": "antyprompt",
 	"main": "worker/index.ts",
 	"compatibility_date": "2026-07-02",
 	"assets": {
@@ -16,8 +16,8 @@
 	"d1_databases": [
     {
       "binding": "DB",
-      "database_name": "prod-d1",
-      "database_id": "<unique-ID-for-your-database>"
+      "database_name": "antyprompt",
+      "database_id": "a911c13a-bf98-4f36-a69d-903b705d3afe"
     }
   ]
 }
