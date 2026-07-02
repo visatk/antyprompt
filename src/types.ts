@@ -1,0 +1,48 @@
+export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
+
+export type CategoryId =
+  | 'project-planning'
+  | 'code-review'
+  | 'performance'
+  | 'security'
+  | 'seo'
+  | 'bug-fixing'
+  | 'testing'
+  | 'documentation'
+  | 'refactoring'
+  | 'devops';
+
+export interface Prompt {
+  id: string;
+  title: string;
+  description: string;
+  category: CategoryId;
+  difficulty: Difficulty;
+  tags: string[];
+  promptTemplate: string;
+  useCase: string;
+  expectedOutput: string;
+  isPro: boolean;
+}
+
+export interface Category {
+  id: CategoryId;
+  name: string;
+  icon: string;
+  emoji: string;
+  description: string;
+  gradient: string;
+}
+
+export interface FilterState {
+  search: string;
+  category: CategoryId | 'all';
+  difficulty: Difficulty | 'all';
+  sort: 'newest' | 'az' | 'za';
+}
+
+export interface ToastMessage {
+  id: string;
+  type: 'success' | 'error' | 'info';
+  message: string;
+}

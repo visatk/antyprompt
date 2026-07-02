@@ -1,0 +1,49 @@
+{
+	"name": "my-shop",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"lint": "eslint .",
+		"preview": "npm run build && vite preview",
+		"deploy": "wrangler types && npm run build && wrangler deploy",
+		"types": "wrangler types",
+		"db:generate": "npx drizzle-kit generate",
+		"db:migrate": "wrangler d1 migrations apply shop --remote"
+	},
+	"dependencies": {
+		"@hono/zod-validator": "^0.8.0",
+		"@tailwindcss/vite": "^4.3.2",
+		"bitcoinjs-lib": "^7.0.1",
+		"dotenv": "^17.4.2",
+		"drizzle-orm": "^1.0.0-rc.4",
+		"ethers": "^6.17.0",
+		"hono": "^4.12.27",
+		"lucide-react": "^1.23.0",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
+		"react-router-dom": "^7.18.1",
+		"tailwindcss": "^4.3.2",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@cloudflare/vite-plugin": "^1.42.4",
+		"@eslint/js": "^10.0.1",
+		"@types/node": "^24.13.2",
+		"@types/react": "^19.2.17",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.2",
+		"drizzle-kit": "^1.0.0-rc.4",
+		"eslint": "^10.5.0",
+		"eslint-plugin-react-hooks": "^7.1.1",
+		"eslint-plugin-react-refresh": "^0.5.3",
+		"globals": "^17.6.0",
+		"tsx": "^4.22.5",
+		"typescript": "~6.0.2",
+		"typescript-eslint": "^8.61.0",
+		"vite": "^8.1.0",
+		"wrangler": "^4.107.0"
+	}
+}
