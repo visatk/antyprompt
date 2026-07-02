@@ -13,7 +13,7 @@ interface PromptCardProps {
 const PromptCard = memo(function PromptCard({ prompt, category, onSelect, onCopy, index }: PromptCardProps) {
   return (
     <div
-      className="glass gradient-border rounded-2xl p-5 flex flex-col gap-3 card-animate transition-all duration-300 hover:bg-bg-card-hover group"
+      className="glass-morph rounded-2xl p-5 flex flex-col gap-3 card-animate transition-all duration-300 hover:bg-bg-card-hover group"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       {/* Top row: category + difficulty + pro */}

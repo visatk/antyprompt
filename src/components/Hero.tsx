@@ -59,7 +59,7 @@ export default function Hero({ totalPrompts, totalCategories, searchValue, onSea
 
         {/* Heading */}
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-tight mb-4">
-          <span className="text-shimmer">AI Prompt Library</span>
+          <span className="text-gradient-premium">AI Prompt Library</span>
         </h1>
         <p className="text-2xl sm:text-3xl font-semibold text-text-primary mb-6">
           for Elite Developers

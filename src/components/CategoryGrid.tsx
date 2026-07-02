@@ -23,7 +23,7 @@ const CategoryGrid = memo(function CategoryGrid({ categories, selectedCategory, 
           {/* All button */}
           <button
             onClick={() => onSelectCategory('all')}
-            className={`glass gradient-border glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
+            className={`glass-morph glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
               selectedCategory === 'all'
                 ? 'ring-2 ring-accent-purple ring-offset-2 ring-offset-[#06060a] bg-bg-card-hover'
                 : ''
@@ -41,7 +41,7 @@ const CategoryGrid = memo(function CategoryGrid({ categories, selectedCategory, 
             <button
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className={`glass gradient-border glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
+              className={`glass-morph glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
                 selectedCategory === cat.id
                   ? 'ring-2 ring-accent-purple ring-offset-2 ring-offset-[#06060a] bg-bg-card-hover'
                   : ''
