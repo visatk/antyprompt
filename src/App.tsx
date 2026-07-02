@@ -1,12 +1,12 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Header } from './components/Header';
-import { Hero } from './components/Hero';
-import { CategoryGrid } from './components/CategoryGrid';
-import { SearchFilter } from './components/SearchFilter';
-import { PromptCard } from './components/PromptCard';
-import { PromptModal } from './components/PromptModal';
-import { Footer } from './components/Footer';
-import { Toast } from './components/Toast';
+import Header from './components/Header';
+import Hero from './components/Hero';
+import CategoryGrid from './components/CategoryGrid';
+import SearchFilter from './components/SearchFilter';
+import PromptCard from './components/PromptCard';
+import PromptModal from './components/PromptModal';
+import Footer from './components/Footer';
+import Toast from './components/Toast';
 import { categories, prompts } from './data/prompts';
 import type { Prompt, CategoryId, FilterState, ToastMessage } from './types';
 
