@@ -1,4 +1,4 @@
-import type { Category, Prompt } from '../types';
+import type { Category, Prompt } from '../types.js';
 
 export const categories: Category[] = [
   {
