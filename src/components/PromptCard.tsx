@@ -44,9 +44,14 @@ const PromptCard = memo(function PromptCard({ prompt, category, onSelect, onCopy
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-semibold text-text-primary leading-snug group-hover:text-accent-purple-light transition-colors">
-        {prompt.title}
-      </h3>
+      <div>
+        <h3 className="text-lg font-semibold text-text-primary leading-tight group-hover:text-accent-cyan-light transition-colors">
+          {prompt.title}
+        </h3>
+        {prompt.authorName && (
+          <p className="text-xs text-text-muted">By {prompt.authorName}</p>
+        )}
+      </div>
 
       {/* Description */}
       <p className="text-sm text-text-secondary line-clamp-2 leading-relaxed">

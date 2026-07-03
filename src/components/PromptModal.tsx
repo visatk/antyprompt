@@ -110,9 +110,14 @@ export default function PromptModal({ prompt, category, onClose, onCopy }: Promp
           </div>
 
           {/* Title */}
-          <h2 id="modal-title" className="text-2xl font-bold text-text-primary mb-3">
-            {prompt.title}
-          </h2>
+          <div className="mb-3">
+            <h2 id="modal-title" className="text-2xl font-bold text-text-primary">
+              {prompt.title}
+            </h2>
+            {prompt.authorName && (
+              <p className="text-sm text-text-muted mt-1">Shared by {prompt.authorName}</p>
+            )}
+          </div>
 
           {/* Description */}
           <p className="text-text-secondary leading-relaxed mb-8">

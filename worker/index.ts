@@ -1,6 +1,32 @@
 import { Hono } from 'hono';
+import { secureHeaders } from 'hono/secure-headers';
+import { cors } from 'hono/cors';
+
+import authApp from './auth';
+import promptsApp from './prompts';
+
+export type Env = {
+  DB: D1Database;
+  JWT_SECRET: string;
+};
 
 const app = new Hono<{ Bindings: Env }>();
+
+// Global Middlewares
+app.use('*', secureHeaders());
+app.use('*', cors());
+
+// Global Error Handler
+app.onError((err, c) => {
+  console.error(`Global API Error: ${err.message}`);
+  return c.json({ error: 'Internal Server Error' }, 500);
+});
+
+// Mount Auth routes
+app.route('/api/auth', authApp);
+
+// Mount Prompts API
+app.route('/api/data', promptsApp);
 
 // ─── Prompt data (mirrors frontend data) ───
 // In a production app, this would come from D1 database

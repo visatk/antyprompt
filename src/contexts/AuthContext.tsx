@@ -31,6 +31,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch((err) => console.error('Failed to fetch user', err))
       .finally(() => setLoading(false));
+
+    // Global listener for 401s
+    const handleUnauthorized = () => {
+      setUser(null);
+    };
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
   const login = (newUser: User) => {

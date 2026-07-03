@@ -5,12 +5,19 @@ import CategoryGrid from './components/CategoryGrid';
 import SearchFilter from './components/SearchFilter';
 import PromptCard from './components/PromptCard';
 import PromptModal from './components/PromptModal';
+import SharePromptModal from './components/SharePromptModal';
+import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
-import { categories, prompts } from './data/prompts';
-import type { Prompt, CategoryId, FilterState, ToastMessage } from './types';
+import { useAuth } from './contexts/AuthContext';
+import { apiFetch } from './utils/api';
+import type { Prompt, Category, CategoryId, FilterState, ToastMessage } from './types';
 
 function App() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     category: 'all',
@@ -19,11 +26,43 @@ function App() {
   });
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const { user } = useAuth();
+
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [catRes, promptRes] = await Promise.all([
+          apiFetch('/api/data/categories'),
+          apiFetch('/api/data/prompts')
+        ]);
+        
+        if (catRes.ok && promptRes.ok) {
+          const catData = await catRes.json();
+          const promptData = await promptRes.json();
+          setCategories(catData);
+          setPrompts(promptData);
+        } else {
+          addToast('error', 'Failed to load prompt library data.');
+        }
+      } catch (err) {
+        addToast('error', 'Network error while loading data.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Keyboard shortcut: "/" to focus search
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+      const activeTag = document.activeElement?.tagName;
+      const isInput = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || (document.activeElement as HTMLElement)?.isContentEditable;
+      if (e.key === '/' && !isInput) {
         e.preventDefault();
         document.getElementById('prompt-search')?.focus();
       }
@@ -78,7 +117,7 @@ function App() {
       counts[cat.id] = prompts.filter(p => p.category === cat.id).length;
     }
     return counts;
-  }, []);
+  }, [categories, prompts]);
 
   // Filter & sort prompts
   const filteredPrompts = useMemo(() => {
@@ -119,21 +158,65 @@ function App() {
     }
 
     return result;
-  }, [filters]);
+  }, [filters, prompts]);
 
   // Get category for a prompt
   const getCategoryForPrompt = useCallback((prompt: Prompt) => {
     return categories.find(c => c.id === prompt.category);
-  }, []);
+  }, [categories]);
+
+  const handleShareClick = () => {
+    if (!user) {
+      addToast('info', 'Please sign in to share a prompt.');
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsShareModalOpen(true);
+  };
+
+  const handleShareSubmit = async (data: any) => {
+    try {
+      const res = await apiFetch('/api/data/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        addToast('success', 'Prompt shared successfully! Reloading...');
+        setIsShareModalOpen(false);
+        // Refresh prompts
+        const promptRes = await apiFetch('/api/data/prompts');
+        if (promptRes.ok) {
+          setPrompts(await promptRes.json());
+        }
+      } else {
+        const err = await res.json();
+        addToast('error', err.error || 'Failed to share prompt');
+      }
+    } catch (err) {
+      addToast('error', 'Network error');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#06060a]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-accent-purple border-t-transparent rounded-full animate-spin" />
+          <p className="text-text-secondary font-medium tracking-wide">Loading AI Library...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-[#06060a]">
       {/* Animated background mesh */}
       <div className="bg-mesh" />
 
       {/* Content */}
       <div className="relative z-10">
-        <Header />
+        <Header onShareClick={handleShareClick} />
 
         <main>
           {/* Hero Section */}
@@ -163,7 +246,7 @@ function App() {
               <h2 className="text-3xl sm:text-4xl font-bold mb-3">
                 <span className="text-shimmer">All Prompts</span>
               </h2>
-              <p className="text-[var(--color-text-secondary)] max-w-2xl mx-auto">
+              <p className="text-text-secondary max-w-2xl mx-auto">
                 Production-ready AI prompts designed for real-world development workflows
               </p>
             </div>
@@ -194,13 +277,13 @@ function App() {
             ) : (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold mb-2 text-[var(--color-text-primary)]">No prompts found</h3>
-                <p className="text-[var(--color-text-secondary)]">
+                <h3 className="text-xl font-semibold mb-2 text-text-primary">No prompts found</h3>
+                <p className="text-text-secondary">
                   Try adjusting your search or filters to find what you're looking for.
                 </p>
                 <button
                   onClick={() => setFilters({ search: '', category: 'all', difficulty: 'all', sort: 'newest' })}
-                  className="mt-4 px-6 py-2 rounded-lg bg-gradient-to-r from-[var(--color-accent-purple)] to-[var(--color-accent-cyan)] text-white font-medium hover:opacity-90 transition-opacity cursor-pointer"
+                  className="mt-6 px-6 py-2.5 rounded-lg bg-gradient-to-r from-accent-purple to-accent-cyan text-white font-medium hover:opacity-90 transition-opacity cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-purple"
                 >
                   Clear all filters
                 </button>
@@ -218,6 +301,18 @@ function App() {
         category={selectedPrompt ? getCategoryForPrompt(selectedPrompt) : undefined}
         onClose={() => setSelectedPrompt(null)}
         onCopy={handleCopy}
+      />
+
+      <SharePromptModal
+        categories={categories}
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onSubmit={handleShareSubmit}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
 
       {/* Toasts */}

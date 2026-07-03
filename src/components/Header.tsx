@@ -4,7 +4,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { useClickOutside } from '../hooks/useClickOutside';
 import AuthModal from './AuthModal';
 
-export default function Header() {
+interface HeaderProps {
+  onShareClick: () => void;
+}
+
+export default function Header({ onShareClick }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -48,6 +52,13 @@ export default function Header() {
 
           {/* Right side */}
           <div className="hidden md:flex items-center gap-4">
+            <button
+              onClick={onShareClick}
+              className="gradient-border flex items-center gap-2 px-4 py-2 rounded-lg glass text-sm font-medium text-text-primary hover:text-accent-cyan-light transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-accent-purple" />
+              Share Prompt
+            </button>
             <a
               href="https://github.com"
               target="_blank"
@@ -162,6 +173,17 @@ export default function Header() {
               <Star className="w-4 h-4" />
               Star on GitHub
             </a>
+
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                onShareClick();
+              }}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg glass text-sm font-medium text-accent-cyan hover:bg-bg-glass-hover transition-colors text-left"
+            >
+              <Sparkles className="w-4 h-4" />
+              Share Prompt
+            </button>
 
             {user && (
               <button 

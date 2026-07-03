@@ -23,6 +23,7 @@ export interface Prompt {
   useCase: string;
   expectedOutput: string;
   isPro: boolean;
+  authorName?: string | null;
 }
 
 export interface Category {
