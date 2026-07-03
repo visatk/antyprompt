@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { drizzle } from 'drizzle-orm/d1';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, or, like } from 'drizzle-orm';
 import { prompts, categories, users } from '../src/db/schema.js';
 import { verify } from 'hono/jwt';
 import { getCookie } from 'hono/cookie';
@@ -35,13 +35,53 @@ const authMiddleware = async (c: any, next: any) => {
 // GET /api/data/categories
 promptsApp.get('/categories', async (c) => {
   const db = drizzle(c.env.DB);
-  const result = await db.select().from(categories);
+  const categoriesList = await db.select().from(categories);
+  
+  // Also get counts for each category
+  const promptsList = await db.select({ categoryId: prompts.categoryId }).from(prompts);
+  const counts = promptsList.reduce((acc: Record<string, number>, p) => {
+    acc[p.categoryId] = (acc[p.categoryId] || 0) + 1;
+    return acc;
+  }, {});
+
+  const result = categoriesList.map(cat => ({
+    ...cat,
+    count: counts[cat.id] || 0
+  }));
+  
+  // Caching: Categories rarely change
+  c.header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+  
   return c.json(result);
 });
 
 // GET /api/data/prompts
 promptsApp.get('/prompts', async (c) => {
   const db = drizzle(c.env.DB);
+  
+  const search = c.req.query('search') || '';
+  const category = c.req.query('category') || 'all';
+  const difficulty = c.req.query('difficulty') || 'all';
+  const page = parseInt(c.req.query('page') || '1', 10);
+  const limit = parseInt(c.req.query('limit') || '12', 10);
+  const offset = (page - 1) * limit;
+
+  const conditions = [];
+  if (category !== 'all') conditions.push(eq(prompts.categoryId, category));
+  if (difficulty !== 'all') conditions.push(eq(prompts.difficulty, difficulty));
+  if (search) {
+    const q = `%${search}%`;
+    conditions.push(
+      or(
+        like(prompts.title, q),
+        like(prompts.description, q),
+        like(prompts.tags, q)
+      )
+    );
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
   const result = await db
     .select({
       id: prompts.id,
@@ -59,7 +99,10 @@ promptsApp.get('/prompts', async (c) => {
     })
     .from(prompts)
     .leftJoin(users, eq(prompts.userId, users.id))
-    .orderBy(desc(prompts.createdAt));
+    .where(whereClause)
+    .orderBy(desc(prompts.createdAt))
+    .limit(limit)
+    .offset(offset);
   
   // Transform the tags JSON string back to array if needed
   const formatted = result.map((p: any) => ({

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
@@ -31,4 +31,11 @@ export const prompts = sqliteTable('prompts', {
   expectedOutput: text('expected_output').notNull(),
   isPro: integer('is_pro', { mode: 'boolean' }).notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+}, (table) => {
+  return {
+    categoryIdx: index('category_idx').on(table.categoryId),
+    difficultyIdx: index('difficulty_idx').on(table.difficulty),
+    createdIdx: index('created_at_idx').on(table.createdAt),
+    userIdx: index('user_idx').on(table.userId),
+  };
 });

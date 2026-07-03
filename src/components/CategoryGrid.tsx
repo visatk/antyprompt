@@ -12,7 +12,7 @@ const CategoryGrid = memo(function CategoryGrid({ categories, selectedCategory, 
   const totalCount = Object.values(promptCounts).reduce((sum, c) => sum + c, 0);
 
   return (
-    <section id="categories" className="px-6 py-16">
+    <div className="w-full">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-text-primary mb-3">Browse by Category</h2>
@@ -60,7 +60,7 @@ const CategoryGrid = memo(function CategoryGrid({ categories, selectedCategory, 
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 });
 

@@ -6,11 +6,11 @@ import AuthModal from './AuthModal';
 
 interface HeaderProps {
   onShareClick: () => void;
+  onSignInClick: () => void;
 }
 
-export default function Header({ onShareClick }: HeaderProps) {
+export default function Header({ onShareClick, onSignInClick }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -106,8 +106,8 @@ export default function Header({ onShareClick }: HeaderProps) {
               </div>
             ) : (
               <button
-                onClick={() => setIsAuthModalOpen(true)}
-                className="px-5 py-2 rounded-lg bg-gradient-to-r from-accent-purple to-accent-cyan text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                onClick={onSignInClick}
+                className="px-5 py-2 rounded-lg bg-gradient-to-r from-accent-purple to-accent-cyan text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
               >
                 Sign In
               </button>
@@ -118,8 +118,11 @@ export default function Header({ onShareClick }: HeaderProps) {
           <div className="md:hidden flex items-center gap-3">
             {!user && (
               <button
-                onClick={() => setIsAuthModalOpen(true)}
-                className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-accent-purple to-accent-cyan text-white text-sm font-medium"
+                onClick={() => {
+                  setMobileOpen(false);
+                  onSignInClick();
+                }}
+                className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-accent-purple to-accent-cyan text-white text-sm font-medium cursor-pointer"
               >
                 Sign In
               </button>
@@ -199,11 +202,6 @@ export default function Header({ onShareClick }: HeaderProps) {
           </nav>
         )}
       </header>
-
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-      />
     </>
   );
 }

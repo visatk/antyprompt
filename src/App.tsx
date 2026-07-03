@@ -31,31 +31,71 @@ function App() {
 
   const { user } = useAuth();
 
-  // Fetch data on mount
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Fetch categories on mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [catRes, promptRes] = await Promise.all([
-          apiFetch('/api/data/categories'),
-          apiFetch('/api/data/prompts')
-        ]);
-        
-        if (catRes.ok && promptRes.ok) {
-          const catData = await catRes.json();
-          const promptData = await promptRes.json();
-          setCategories(catData);
-          setPrompts(promptData);
-        } else {
-          addToast('error', 'Failed to load prompt library data.');
-        }
-      } catch (err) {
-        addToast('error', 'Network error while loading data.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+    apiFetch('/api/data/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(() => addToast('error', 'Failed to load categories'));
   }, []);
+
+  // Fetch prompts when filters or page change
+  const fetchPrompts = useCallback(async (reset = false) => {
+    try {
+      if (reset) setIsLoading(true);
+      
+      const currentPage = reset ? 1 : page;
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '12',
+        category: filters.category,
+        difficulty: filters.difficulty,
+        search: filters.search
+      });
+
+      const res = await apiFetch(`/api/data/prompts?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        
+        // Sorting logic (Backend doesn't support complex sort yet, sort locally for AZ/ZA)
+        let sorted = [...data];
+        if (filters.sort === 'az') sorted.sort((a, b) => a.title.localeCompare(b.title));
+        if (filters.sort === 'za') sorted.sort((a, b) => b.title.localeCompare(a.title));
+
+        if (reset) {
+          setPrompts(sorted);
+        } else {
+          setPrompts(prev => {
+             // Handle case if sort is active on new appended elements 
+             // (Ideally sort should be in backend completely)
+             const newPrompts = [...prev, ...sorted];
+             if (filters.sort === 'az') newPrompts.sort((a, b) => a.title.localeCompare(b.title));
+             if (filters.sort === 'za') newPrompts.sort((a, b) => b.title.localeCompare(a.title));
+             return newPrompts;
+          });
+        }
+        setHasMore(data.length === 12);
+        if (reset) setPage(2);
+        else setPage(p => p + 1);
+      }
+    } catch (err) {
+      addToast('error', 'Network error while loading data.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [filters, page, addToast]);
+
+  // Trigger search on filter change
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      fetchPrompts(true);
+    }, 300);
+    return () => clearTimeout(delay);
+  }, [filters.search, filters.category, filters.difficulty, filters.sort]);
+
 
   // Keyboard shortcut: "/" to focus search
   useEffect(() => {
@@ -110,55 +150,17 @@ function App() {
     }, 100);
   }, []);
 
-  // Compute prompt counts per category
+  // Compute prompt counts per category (from backend categories.count)
   const promptCounts = useMemo(() => {
     const counts = {} as Record<CategoryId, number>;
     for (const cat of categories) {
-      counts[cat.id] = prompts.filter(p => p.category === cat.id).length;
+      counts[cat.id] = cat.count || 0;
     }
     return counts;
-  }, [categories, prompts]);
+  }, [categories]);
 
-  // Filter & sort prompts
-  const filteredPrompts = useMemo(() => {
-    let result = [...prompts];
-
-    // Category filter
-    if (filters.category !== 'all') {
-      result = result.filter(p => p.category === filters.category);
-    }
-
-    // Difficulty filter
-    if (filters.difficulty !== 'all') {
-      result = result.filter(p => p.difficulty === filters.difficulty);
-    }
-
-    // Search filter
-    if (filters.search.trim()) {
-      const query = filters.search.toLowerCase().trim();
-      result = result.filter(p =>
-        p.title.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query) ||
-        p.tags.some(t => t.toLowerCase().includes(query)) ||
-        p.category.toLowerCase().includes(query)
-      );
-    }
-
-    // Sort
-    switch (filters.sort) {
-      case 'az':
-        result.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case 'za':
-        result.sort((a, b) => b.title.localeCompare(a.title));
-        break;
-      default:
-        // 'newest' — keep original order
-        break;
-    }
-
-    return result;
-  }, [filters, prompts]);
+  // Use prompts directly, backend filters it
+  const filteredPrompts = prompts;
 
   // Get category for a prompt
   const getCategoryForPrompt = useCallback((prompt: Prompt) => {
@@ -216,7 +218,10 @@ function App() {
 
       {/* Content */}
       <div className="relative z-10">
-        <Header onShareClick={handleShareClick} />
+        <Header 
+          onShareClick={handleShareClick} 
+          onSignInClick={() => setIsAuthModalOpen(true)} 
+        />
 
         <main>
           {/* Hero Section */}
@@ -240,7 +245,7 @@ function App() {
           </section>
 
           {/* Prompts Section */}
-          <section id="prompts-section" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-24">
+          <section id="prompts" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-24">
             {/* Section Header */}
             <div className="text-center mb-8">
               <h2 className="text-3xl sm:text-4xl font-bold mb-3">
@@ -265,7 +270,7 @@ function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredPrompts.map((prompt, index) => (
                   <PromptCard
-                    key={prompt.id}
+                    key={`${prompt.id}-${index}`}
                     prompt={prompt}
                     category={getCategoryForPrompt(prompt)!}
                     onSelect={setSelectedPrompt}
@@ -274,7 +279,22 @@ function App() {
                   />
                 ))}
               </div>
-            ) : (
+              
+              {hasMore && (
+                <div className="mt-12 text-center">
+                  <button
+                    onClick={() => fetchPrompts(false)}
+                    className="px-8 py-3 rounded-xl glass bg-bg-primary/50 text-text-primary hover:text-white hover:bg-bg-primary font-medium transition-all focus-visible:ring-2 focus-visible:ring-accent-purple outline-none group"
+                  >
+                    Load More Prompts
+                    <span className="inline-block ml-2 group-hover:translate-y-1 transition-transform">
+                      ↓
+                    </span>
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold mb-2 text-text-primary">No prompts found</h3>

@@ -40,6 +40,7 @@ export interface Category {
   emoji: string;
   description: string;
   gradient: string;
+  count?: number; // Backend provided count
 }
 
 export interface FilterState {
