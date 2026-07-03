@@ -8,10 +8,10 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "npm run build && vite preview",
-		"deploy": "wrangler types && npm run build && wrangler deploy",
+		"deploy": "npx drizzle-kit generate && npm run db:migrate && wrangler types && npm run build && wrangler deploy",
 		"types": "wrangler types",
 		"db:generate": "npx drizzle-kit generate",
-		"db:migrate": "wrangler d1 migrations apply shop --remote"
+		"db:migrate": "wrangler d1 migrations apply antyprompt --remote"
 	},
 	"dependencies": {
 		"@hono/zod-validator": "^0.8.0",
