@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { X, Copy, Check, Crown, Lightbulb, Target } from 'lucide-react';
 import type { Prompt, Category } from '../types';
 
@@ -11,14 +11,53 @@ interface PromptModalProps {
 
 export default function PromptModal({ prompt, category, onClose, onCopy }: PromptModalProps) {
   const [copied, setCopied] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    if (!prompt) return;
+    previouslyFocusedElement.current = document.activeElement as HTMLElement;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
     };
+    
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+    
+    // Focus the first element on mount
+    const timer = setTimeout(() => {
+      const closeBtn = modalRef.current?.querySelector('button') as HTMLElement;
+      if (closeBtn) closeBtn.focus();
+    }, 10);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(timer);
+      if (previouslyFocusedElement.current) {
+        previouslyFocusedElement.current.focus();
+      }
+    };
+  }, [onClose, prompt]);
 
   if (!prompt) return null;
 
@@ -32,8 +71,12 @@ export default function PromptModal({ prompt, category, onClose, onCopy }: Promp
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md modal-overlay"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
       <div
+        ref={modalRef}
         className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto glass-strong rounded-2xl modal-content"
         onClick={(e) => e.stopPropagation()}
       >
@@ -67,7 +110,7 @@ export default function PromptModal({ prompt, category, onClose, onCopy }: Promp
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-text-primary mb-3">
+          <h2 id="modal-title" className="text-2xl font-bold text-text-primary mb-3">
             {prompt.title}
           </h2>
 

@@ -23,7 +23,9 @@ const CategoryGrid = memo(function CategoryGrid({ categories, selectedCategory, 
           {/* All button */}
           <button
             onClick={() => onSelectCategory('all')}
-            className={`glass-morph glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
+            aria-pressed={selectedCategory === 'all'}
+            aria-label="View all categories"
+            className={`glass-morph glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-purple outline-none ${
               selectedCategory === 'all'
                 ? 'ring-2 ring-accent-purple ring-offset-2 ring-offset-[#06060a] bg-bg-card-hover'
                 : ''
@@ -41,7 +43,9 @@ const CategoryGrid = memo(function CategoryGrid({ categories, selectedCategory, 
             <button
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className={`glass-morph glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer ${
+              aria-pressed={selectedCategory === cat.id}
+              aria-label={`Filter by ${cat.name} category`}
+              className={`glass-morph glow-hover rounded-xl p-4 text-center transition-all duration-300 hover:scale-[1.03] cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-purple outline-none ${
                 selectedCategory === cat.id
                   ? 'ring-2 ring-accent-purple ring-offset-2 ring-offset-[#06060a] bg-bg-card-hover'
                   : ''

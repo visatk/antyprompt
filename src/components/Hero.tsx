@@ -28,9 +28,13 @@ export default function Hero({ totalPrompts, totalCategories, searchValue, onSea
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT') {
-        e.preventDefault();
-        searchRef.current?.focus();
+      if (e.key === '/') {
+        const activeTag = document.activeElement?.tagName;
+        const isInput = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || (document.activeElement as HTMLElement)?.isContentEditable;
+        if (!isInput) {
+          e.preventDefault();
+          searchRef.current?.focus();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -40,12 +44,14 @@ export default function Hero({ totalPrompts, totalCategories, searchValue, onSea
   return (
     <section id="home" className="relative pt-32 pb-20 px-6 overflow-hidden">
       {/* Floating decorative orbs */}
-      <div className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-gradient-to-br from-accent-purple/20 to-transparent blur-3xl float-animation pointer-events-none" />
+      <div aria-hidden="true" className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-gradient-to-br from-accent-purple/20 to-transparent blur-3xl float-animation pointer-events-none" />
       <div
+        aria-hidden="true"
         className="absolute top-40 right-[5%] w-96 h-96 rounded-full bg-gradient-to-bl from-accent-cyan/15 to-transparent blur-3xl float-animation pointer-events-none"
         style={{ animationDelay: '2s' }}
       />
       <div
+        aria-hidden="true"
         className="absolute bottom-10 left-[30%] w-64 h-64 rounded-full bg-gradient-to-tr from-accent-pink/10 to-transparent blur-3xl float-animation pointer-events-none"
         style={{ animationDelay: '4s' }}
       />

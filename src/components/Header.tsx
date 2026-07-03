@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Sparkles, Menu, X, Star, User as UserIcon, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useClickOutside } from '../hooks/useClickOutside';
 import AuthModal from './AuthModal';
 
 export default function Header() {
@@ -8,6 +9,12 @@ export default function Header() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  useClickOutside(dropdownRef, () => {
+    if (profileDropdownOpen) setProfileDropdownOpen(false);
+  });
+
   const { user, logout } = useAuth();
 
   const navLinks = [
@@ -52,10 +59,12 @@ export default function Header() {
             </a>
 
             {user ? (
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full glass hover:bg-bg-glass-hover transition-colors border border-accent-purple/30"
+                  aria-expanded={profileDropdownOpen}
+                  aria-haspopup="true"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full glass hover:bg-bg-glass-hover transition-colors border border-accent-purple/30 focus-visible:ring-2 focus-visible:ring-accent-purple outline-none"
                 >
                   <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-accent-purple to-accent-cyan flex items-center justify-center text-white font-bold text-xs">
                     {user.name.charAt(0).toUpperCase()}
@@ -106,8 +115,9 @@ export default function Header() {
             )}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-lg glass hover:bg-bg-glass-hover transition-colors"
-              aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+              aria-label="Toggle navigation menu"
+              className="p-2 rounded-lg glass hover:bg-bg-glass-hover transition-colors focus-visible:ring-2 focus-visible:ring-accent-purple outline-none"
             >
               {mobileOpen ? (
                 <X className="w-5 h-5 text-text-primary" />

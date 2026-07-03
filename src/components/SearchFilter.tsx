@@ -33,7 +33,8 @@ const SearchFilter = memo(function SearchFilter({ filters, onFilterChange, resul
               <button
                 key={d.value}
                 onClick={() => onFilterChange({ ...filters, difficulty: d.value })}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                aria-pressed={isActive}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-purple outline-none ${
                   isActive
                     ? difficultyColors[d.value]
                     : 'glass text-text-muted hover:text-text-secondary hover:bg-bg-glass-hover'
@@ -46,9 +47,12 @@ const SearchFilter = memo(function SearchFilter({ filters, onFilterChange, resul
         </div>
 
         {/* Sort dropdown */}
+        <label htmlFor="sort-select" className="sr-only">Sort by</label>
         <select
+          id="sort-select"
           value={filters.sort}
           onChange={(e) => onFilterChange({ ...filters, sort: e.target.value as FilterState['sort'] })}
+          aria-label="Sort prompts"
           className="ml-auto px-4 py-1.5 rounded-lg glass text-sm text-text-secondary bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-accent-purple/30 cursor-pointer appearance-none dropdown-glass hover:bg-bg-glass-hover transition-colors"
         >
           <option value="newest">Newest</option>
