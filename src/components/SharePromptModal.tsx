@@ -115,7 +115,7 @@ export default function SharePromptModal({ categories, isOpen, onClose, onSubmit
                 <select
                   id="categoryId"
                   value={formData.categoryId}
-                  onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                  onChange={e => setFormData({ ...formData, categoryId: e.target.value as any })}
                   className="w-full px-4 py-2.5 rounded-xl glass text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-purple appearance-none"
                 >
                   {categories.map(c => (

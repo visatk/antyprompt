@@ -5,7 +5,7 @@ import { sign, verify } from 'hono/jwt';
 import { setCookie, getCookie, deleteCookie } from 'hono/cookie';
 import { drizzle } from 'drizzle-orm/d1';
 import { eq } from 'drizzle-orm';
-import { users } from '../src/db/schema';
+import { users } from '../src/db/schema.js';
 import { scryptSync, randomBytes, timingSafeEqual } from 'node:crypto';
 
 export type Env = {
@@ -137,7 +137,7 @@ authApp.get('/me', async (c) => {
 
   try {
     if (!c.env.JWT_SECRET) throw new Error('JWT_SECRET is not configured');
-    const decoded = await verify(token, c.env.JWT_SECRET);
+    const decoded = await verify(token, c.env.JWT_SECRET, 'HS256');
     return c.json({ user: decoded });
   } catch {
     return c.json({ user: null });

@@ -1,15 +1,15 @@
 import { Hono } from 'hono';
 import { drizzle } from 'drizzle-orm/d1';
 import { eq, desc } from 'drizzle-orm';
-import { prompts, categories, users } from '../src/db/schema';
+import { prompts, categories, users } from '../src/db/schema.js';
 import { verify } from 'hono/jwt';
 import { getCookie } from 'hono/cookie';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
-import type { Env } from './index';
+import type { Env } from './index.js';
 
 // We import the static data for the seeder
-import { categories as staticCategories, prompts as staticPrompts } from '../src/data/prompts';
+import { categories as staticCategories, prompts as staticPrompts } from '../src/data/prompts.js';
 
 const promptsApp = new Hono<{ Bindings: Env; Variables: { user: any } }>();
 
@@ -24,7 +24,7 @@ const authMiddleware = async (c: any, next: any) => {
   const token = getCookie(c, 'auth_token');
   if (!token) return c.json({ error: 'Unauthorized' }, 401);
   try {
-    const decoded = await verify(token, c.env.JWT_SECRET || 'fallback-secret-for-dev');
+    const decoded = await verify(token, c.env.JWT_SECRET || 'fallback-secret-for-dev', 'HS256');
     c.set('user', decoded);
     await next();
   } catch {
@@ -62,7 +62,7 @@ promptsApp.get('/prompts', async (c) => {
     .orderBy(desc(prompts.createdAt));
   
   // Transform the tags JSON string back to array if needed
-  const formatted = result.map(p => ({
+  const formatted = result.map((p: any) => ({
     ...p,
     category: p.categoryId, // map back to frontend type
     tags: typeof p.tags === 'string' ? JSON.parse(p.tags) : p.tags,

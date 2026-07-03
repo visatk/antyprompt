@@ -2,8 +2,8 @@ import { Hono } from 'hono';
 import { secureHeaders } from 'hono/secure-headers';
 import { cors } from 'hono/cors';
 
-import authApp from './auth';
-import promptsApp from './prompts';
+import authApp from './auth.js';
+import promptsApp from './prompts.js';
 
 export type Env = {
   DB: D1Database;

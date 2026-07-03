@@ -10,7 +10,14 @@ export type CategoryId =
   | 'testing'
   | 'documentation'
   | 'refactoring'
-  | 'devops';
+  | 'devops'
+  | 'subagents'
+  | 'custom-agents'
+  | 'permissions'
+  | 'browser'
+  | 'artifacts'
+  | 'ui-ux'
+  | 'config';
 
 export interface Prompt {
   id: string;

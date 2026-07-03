@@ -459,7 +459,6 @@ Identify any deprecated component usage, prop type mismatches, or missing export
   },
   {
     id: 'cra-02',
-    title: 'OWASP Vulnerability Scan',
     category: 'code-review',
     difficulty: 'advanced',
     title: 'OWASP Top 10 Vulnerability Scan',
